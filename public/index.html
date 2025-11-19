@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happiness Mood Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="mood.css">
+</head>
+<body>
+    <audio controls autoplay loop >
+        <source src="./Acoustic Fingerpicking With Nature-Short.wav" type="audio/wav">
+        Your browser does not support the audio element.
+      </audio>
+    <div class="navbar-Top">
+        <nav>
+            
+                <a href="#mood-survey">Take Mood Survey</a>
+                <a href="#dashboard">View Dashboard</a>
+                <a href="#resources-support">Resources & Support</a>
+                <a href="#feedback">Feedback & Suggestions</a>
+            
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Homepage -->
+        <section id="homepage">
+            <h1>Welcome to <br> Happiness Mood Dashboard</h1>
+            <p>A tool to monitor and support the emotional well-being of our university community</p>
+            <button class="btn-Survey" onclick="showSurvey()">Take Mood Survey</button>
+        </section>
+
+        <!-- Mood Survey -->
+        <section id="mood-survey" style="display: none;">
+            <div class="row-header">
+            <h1>Mood Survey</h1>
+            <h5>Fill out the form below!</h5>
+            <div>
+    
+        <div class="row">
+            <div class="col-md-12">
+              <form id="survey-form">
+              
+                <fieldset>
+                              
+                    <label for="current-mood">How are you feeling right now?</label>
+                    <select id="current-mood" name="currentMood">
+                        <option value="Happy">Happy</option>
+                        <option value="Sad">Sad</option>
+                        <option value="Anxious">Anxious</option>
+                        <option value="Excited">Excited</option>
+                        <option value="Stressed">Stressed</option>
+                    </select>  
+
+                    <label for="main-reason">What kindness act you did today?</label>
+                   
+                    <textarea id="main-reason" name="mainReason" rows="3" cols="15"></textarea>
+                    
+                    <!-- <label for="support-interest">Would you like to receive resources or support?</label>
+                    <select id="support-interest" name="supportInterest">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select> -->
+
+                    <label for="mood-three-days-ago">What was your mood 3 days ago?</label>
+        <select id="mood-three-days-ago" name="moodThreeDaysAgo">
+            <option value="Happy">Happy</option>
+            <option value="Sad">Sad</option>
+            <option value="Anxious">Anxious</option>
+            <option value="Excited">Excited</option>
+            <option value="Stressed">Stressed</option>
+        </select>
+        <label for="mood-one-week-ago">What was your mood 1 week ago?</label>
+        <select id="mood-one-week-ago" name="moodOneWeekAgo">
+            <option value="Happy">Happy</option>
+            <option value="Sad">Sad</option>
+            <option value="Anxious">Anxious</option>
+            <option value="Excited">Excited</option>
+            <option value="Stressed">Stressed</option>
+        </select>
+                 </fieldset>
+               
+                <button class="btn-masterful" type="submit">Submit</button>
+                
+               </form>
+                </div>
+              </div>
+        </section>
+
+        <!-- Dashboard Overview -->
+        <section id="dashboard">
+            <h2>Dashboard Overview</h2>
+            <div class="dashboard">
+                <!-- Mood Summary -->
+                <div class="mood-summary">
+                    <h3>Mood Summary</h3>
+                    <canvas id="mood-chart-summary"></canvas>
+                </div>
+                <!-- Trend Analysis -->
+                <div class="trend-analysis">
+                    <h3>Trend Analysis</h3>
+                    <canvas id="weekly-trend-chart"></canvas>
+                </div>
+                <!-- Mood Map -->
+                <!-- <div class="mood-map">
+                    <h3>Mood Map</h3>
+                    <canvas id="mood-map-chart"></canvas>
+                </div> -->
+            </div>
+        </section>
+
+    
+
+        <!-- Resources & Support -->
+        <section id="resources-support" >
+            <div class="resources-support">
+            <h2>Resources & Support</h2>
+            <ul>
+                <li><a href="#">Guides</a>: Articles and videos on managing stress, anxiety, and improving happiness.</li>
+                <li><a href="#">Support Services</a>: Information about university counseling services, peer support groups, and external resources.</li>
+                <li><a href="#">Events</a>: Upcoming workshops, seminars, or activities focused on well-being and mental health.</li>
+            </ul>
+        </div>
+        </section>
+
+        <!-- Feedback & Suggestions -->
+        <section id="feedback-suggestions" >
+            <div class="feedback-suggestions">
+            <h2>Feedback & Suggestions</h2>
+            <form id="feedback-form">
+                <textarea  id="feedback" name="feedback" rows="4" cols="20"placeholder="Enter your feedback"></textarea>
+                <br>
+                <button type="submit" class="btn btn-masterful">
+                    <span class="icon">&#x1F680;</span>
+                    <span class="btn-txt">Submit</span>
+                </button>
+            </form>
+          </div>
+        </section>
+    </div>
+    <br>
+    <br>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#survey-form').submit(function(event) {
+                event.preventDefault();
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/submit',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        alert(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+       
+// Fetch mood data from the server
+fetch('/mood-data')
+.then(response => response.json())
+.then(moodData => {
+    // Prepare data for Chart.js - Mood Summary
+    const summaryData = moodData.reduce((acc, row) => {
+        if (!acc[row.current_mood]) {
+            acc[row.current_mood] = 0;
+        }
+        acc[row.current_mood] += row.count;
+        return acc;
+    }, {});
+
+    // Create Chart.js pie chart for mood summary
+    const moodSummaryCtx = document.getElementById('mood-chart-summary').getContext('2d');
+    new Chart(moodSummaryCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(summaryData),
+            datasets: [{
+                data: Object.values(summaryData),
+                backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0'],
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Daily Mood Distribution'
+            }
+        }
+    });
+
+    // Prepare data for weekly trend analysis
+    const weeklyTrendLabels = [];
+    const weeklyTrendData = [];
+    const weeklyMoodData = {};
+
+    moodData.forEach(row => {
+        const date = new Date(row.date);
+        const weekNumber = getWeekNumber(date);
+        if (!weeklyMoodData[weekNumber]) {
+            weeklyMoodData[weekNumber] = {};
+        }
+        if (!weeklyMoodData[weekNumber][row.current_mood]) {
+            weeklyMoodData[weekNumber][row.current_mood] = 0;
+        }
+        weeklyMoodData[weekNumber][row.current_mood] += row.count;
+    });
+
+    for (const weekNumber in weeklyMoodData) {
+        weeklyTrendLabels.push(`Week ${weekNumber}`);
+        const weekMoodData = weeklyMoodData[weekNumber];
+        const moodCounts = [];
+        for (const mood in summaryData) {
+            moodCounts.push(weekMoodData[mood] || 0);
+        }
+        weeklyTrendData.push(moodCounts);
+    }
+
+    // Create Chart.js bar chart for weekly trend analysis
+    const weeklyTrendCtx = document.getElementById('weekly-trend-chart').getContext('2d');
+    new Chart(weeklyTrendCtx, {
+        type: 'bar',
+        data: {
+            labels: weeklyTrendLabels,
+            datasets: Object.keys(summaryData).map((mood, index) => ({
+                label: mood,
+                data: weeklyTrendData.map(counts => counts[index]),
+                backgroundColor: getRandomColor(),
+                borderWidth: 1
+            }))
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Weekly Mood Trend'
+            },
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Week'
+                    }
+                }],
+                yAxes: [{
+                    stacked: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Mood Count'
+                    }
+                }]
+            }
+        }
+    });
+})
+.catch(error => console.error('Error fetching mood data:', error));
+
+// Function to get week number
+function getWeekNumber(date) {
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    const millisecondsInDay = 86400000;
+    return Math.ceil((((date - oneJan) / millisecondsInDay) + oneJan.getDay() + 1) / 7);
+}
+
+// Function to generate random color
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+
+
+
+
+    </script>
+    <script src="scripts.js"></script>
+</body>
+</html>
+
+
