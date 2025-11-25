@@ -1,34 +1,28 @@
 # happiness-dashbord-
-📦 1. Install Required Software
-✔ Install Node.js
-
-Download from:
-https://nodejs.org
-
-✔ Install MySQL + MySQL Workbench
-
-Download MySQL Installer from:
-https://dev.mysql.com/downloads/installer/
+1. Install Required Software
+.Install Node.js
+ Download from:
+ https://nodejs.org
+.Install MySQL + MySQL Workbench
+ Download MySQL Installer from:
+ https://dev.mysql.com/downloads/installer/
+.VScode
+ https://code.visualstudio.com/download
 
 During installation, make sure to install:
-
 MySQL Server
-
 MySQL Workbench
-
 You will be asked to set a root password — remember it.
 
-🗂 2. Clone the Repository
-git clone https://github.com/<your-username>/<your-repo>.git
+2. Clone the Repository
+git clone https://github.com/varshakool12-netizen/happiness-dashbord-.git
 cd <your-repo>
 
-🛢 3. Set Up the MySQL Database
+3. Set Up the MySQL Database
 
 Open MySQL Workbench, connect to your MySQL server, then run:
-
 CREATE DATABASE mood_dashboard;
 USE mood_dashboard;
-
 CREATE TABLE moods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     current_mood VARCHAR(50),
@@ -40,30 +34,21 @@ CREATE TABLE moods (
 
 
 If you have a .sql file from a previous version, you can import it:
-
 MySQL Workbench → Server → Data Import → Import from Self-Contained File
 
-📁 4. Install Dependencies
-
+4. Install Dependencies
 Inside the project folder, run:
-
 npm install
 
-
 This installs:
-
 express
-
 mysql2
-
 body-parser
-
 cors
 
-⚙️ 5. Configure the Backend
+5. Configure the Backend
 
 Open server.js and make sure your MySQL credentials are correct:
-
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -71,39 +56,32 @@ const db = mysql.createConnection({
     database: "mood_dashboard"
 });
 
-▶️ 6. Start the Server
+6. Start the Server
 node server.js
-
-
 If everything is working, you will see:
 
 Connected to MySQL database!
 Server running on http://localhost:3000
 
-🌐 7. Open the Application
-
+7. Open the Application
 Go to your browser and open:
-
 http://localhost:3000/index.html
 
 
 You can now:
-
 Submit mood surveys
-
 View charts & summaries
-
 See MySQL data shown in real time
 
-📊 API Endpoints
+API Endpoints
 Submit mood survey
 POST /submit
 
 Get mood data for charts
 GET /mood-data
 
-❗ Troubleshooting
-❌ Error: Cannot connect to MySQL
+Troubleshooting
+Error: Cannot connect to MySQL
 
 Check that MySQL Server is running
 
